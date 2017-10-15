@@ -1,0 +1,165 @@
+﻿<h1>Weather forecast</h1>
+
+
+
+<div class="panel panel-primary" style="margin-top: 20px; height: 500px">
+    <div class="panel-heading">Information skill</div>
+    <div class="panel-body">
+        <div id="header-content" style="padding-top: 20px;">
+            <div class="col-sm-8" style="padding-left:0px; padding-bottom: 10px;">
+                <div class="input-group">                    
+                    <input type="text" [(ngModel)]="keySearch" id="search" name="search" placeholder="Search skill..." class="form-control" (ngModelChange)="searchSkill()" />
+                    <span class="input-group-addon" id="basic-addon1"><i class="glyphicon glyphicon-search"></i></span>
+                </div>
+            
+            </div>
+           <div class="col-sm-4" style="padding-right:0px;">
+               <a class="btn btn-primary" (click)="loadListPageSkill()" style="float:right; margin-bottom:20px; margin-left:10px;"><i class="glyphicon glyphicon-refresh"></i></a>
+               <a class="btn btn-success" data-toggle="modal" data-target="#myModal" style="float:right; margin-bottom:20px;"><i class="glyphicon glyphicon-plus"></i> Add</a>              
+           </div>           
+        </div>
+       <div id="table-skill" style="height: 326px">
+           <table class='table table-bordered' style="margin-bottom: 0px;">
+               <thead>
+                   <tr>
+                       <th width="50px">ID</th>
+                       <th width="300px">Name</th>
+                       <th>Active</th>
+                       <th>Summary</th>
+                   </tr>
+               </thead>
+               <tbody>
+                   <tr *ngIf="!listPageSkill">
+                       <td colspan="4">No data....</td>
+                   </tr>
+                   <tr *ngFor="let item of listPageSkill">
+                       <td>{{ item.id }}</td>
+                       <td>{{ item.name }}</td>
+                       <td>
+                           <span [ngClass]="item.active ? 'label-success':'label-danger'" class="label ">Active</span>                          
+                       </td>
+                       <td>
+                           <a class="btn btn-primary btn-sm" (click)="updateSkill(modalUpdateSkill, item.id)"><i class="glyphicon glyphicon-edit"></i></a>
+                           <a class="btn btn-danger btn-sm" (click)="deleteSkill(item.id)"><i class="glyphicon glyphicon-trash"></i></a>
+                           <a class="btn btn-info btn-sm" (click)="detailSkill(template, item.id)"><i class="glyphicon glyphicon-eye-open"></i></a>
+                       </td>
+                   </tr>
+               </tbody>
+           </table>
+       </div>
+      
+    </div>
+    <div class="col-md-12" style="text-align:center">
+        <pagination [totalItems]="itemsPerPage" [itemsPerPage]="1" [maxSize]="4" [(ngModel)]="pageNumber" (pageChanged)="pageChanged($event)"></pagination>
+    </div>
+    <!--<div class="panel-footer">Panel Footer</div>-->
+</div>
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add information skill</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <label class="col-sm-4">Skill Name <span>*</span></label>
+                    <div class="col-sm-6">
+                        <input class="form-control" required minlenght="1" maxlength="50" id="name" #name="ngModel" [(ngModel)]="skill.Name" type="text" /> 
+                        <div style="padding:5px;" *ngIf="name.errors && (name.dirty || name.touched)" class="alert alert-danger">
+                            <div *ngIf="!name.errors.required">
+                                Name is required    
+                            </div> 
+                            <div *ngIf="!name.errors.minlength">
+                                Name must be at least 1 character
+                            </div> 
+                            <div *ngIf="!name.errors.minlength">
+                                Name can't has more than 50 characters
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" (click)="saveSkill()" [disabled]="!skill.Name"  class="btn btn-info" data-dismiss="modal">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<template #template>
+    <div class="modal-header">
+        <h4 class="modal-title pull-left">Information skill</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body" *ngIf="skill">       
+        <div style="margin: 10px 50px;">
+            <div class="row">
+                <label class="col-sm-4">Skill Name: </label><p>{{skill.name}}</p>
+            </div>
+            <div class="row">
+                <label class="col-sm-4">Active:</label>
+                <span *ngIf="skill.active" class="label label-success">Active</span>
+                <span *ngIf="!skill.active" class="label label-danger">Disable</span>
+            </div>
+        </div>        
+    </div>
+    <div class="modal-footer">       
+        <button type="button" class="btn btn-default" (click)="modalRef.hide()" data-dismiss="modal">Close</button>
+    </div>
+</template>
+
+<template #modalUpdateSkill>
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close"  (click)="modalRef.hide()" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Add information skill</h4>
+        </div>
+        <div class="modal-body">
+            <div class="row">             
+                <div class="col-sm-6">
+                    <input class="form-control" [(ngModel)]="skill.id" type="hidden" />
+                </div>
+            </div>
+            <div class="row" style="margin-bottom:10px">
+                <label class="col-sm-4">Skill Name</label>
+                <div class="col-sm-6">
+                    <input class="form-control" #nameEdit="ngModel" id="nameEdit" required name="skill.name" [(ngModel)]="skill.name" type="text" />
+                    <div style="padding:5px;" *ngIf="name.errors && (name.dirty || name.touched)" class="alert alert-danger">
+                        <div *ngIf="!nameEdit.errors.required">
+                            Name is required
+                        </div>
+                        <div *ngIf="!nameEdit.errors.minlength">
+                            Name must be at least 1 character
+                        </div>
+                        <div *ngIf="!nameEdit.errors.minlength">
+                            Name can't has more than 50 characters
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-sm-4">Active</label>
+                <div class="col-sm-6">      
+                    <ui-switch size="small" [(ngModel)]="skill.active"></ui-switch>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" (click)="saveUpdate(modalUpdateSkill)" class="btn btn-info" data-dismiss="modal">Save</button>
+            <button type="button" class="btn btn-default" (click)="modalRef.hide()" data-dismiss="modal">Close</button>
+        </div>
+    </div>    
+</template>
+
